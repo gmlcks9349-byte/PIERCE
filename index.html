@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIERCE — AI CREATIVE LAB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #4A8AE5;
+    --accent-dim: rgba(74, 138, 229, 0.12);
+    --accent-mid: rgba(74, 138, 229, 0.35);
+    --bg: #0A0A0A;
+    --surface: #111111;
+    --surface2: #1A1A1A;
+    --border: #2A2A2A;
+    --text: #FFFFFF;
+    --text-sub: #BBBBBB;
+    --text-muted: #666666;
+    --danger: #FF4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--accent);
+    letter-spacing: 4px;
+  }
+
+  .logo-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .api-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .api-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── API MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    width: 480px;
+    max-width: 90vw;
+  }
+
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .modal-field { margin-bottom: 16px; }
+
+  .modal-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .modal-input:focus { border-color: var(--accent); }
+
+  .modal-save {
+    width: 100%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    padding: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.2s;
+  }
+
+  .modal-save:hover { opacity: 0.85; }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    margin-bottom: 48px;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 8px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .hero-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    line-height: 1.8;
+    max-width: 520px;
+  }
+
+  .hero-divider {
+    width: 48px;
+    height: 1px;
+    background: var(--accent);
+    margin: 16px 0;
+    opacity: 0.5;
+  }
+
+  /* ── INPUT PANEL ── */
+  .input-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .tab-row {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+    position: relative;
+  }
+
+  .tab.active { color: var(--accent); }
+
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .tab:hover:not(.active) { color: var(--text-sub); }
+
+  .panel-body { padding: 24px; }
+
+  .input-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .url-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .url-input:focus { border-color: var(--accent); }
+  .url-input::placeholder { color: var(--text-muted); }
+
+  .text-area {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 12px 14px;
+    outline: none;
+    resize: vertical;
+    min-height: 140px;
+    transition: border-color 0.2s;
+    line-height: 1.7;
+  }
+
+  .text-area:focus { border-color: var(--accent); }
+  .text-area::placeholder { color: var(--text-muted); }
+
+  .sub-mode-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .toggle-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .toggle-btn.active {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .input-note {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  /* ── RUN BUTTON ── */
+  .run-btn {
+    width: 100%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 6px;
+    padding: 18px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-bottom: 16px;
+  }
+
+  .run-btn:hover:not(:disabled) { opacity: 0.85; }
+  .run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  .status-bar.visible { display: flex; }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  /* ── ERROR BOX ── */
+  .error-box {
+    display: none;
+    padding: 12px 16px;
+    background: rgba(255, 68, 68, 0.08);
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    color: var(--danger);
+    font-size: 12px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+  }
+
+  .error-box.visible { display: block; }
+
+  /* ── REPORT ── */
+  .report-container {
+    display: none;
+    margin-top: 8px;
+  }
+
+  .report-container.visible { display: block; }
+
+  .report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+
+  .report-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .report-meta {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
+  .report-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    border: 1px solid var(--accent-mid);
+    padding: 4px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── REPORT SECTIONS ── */
+  .report-section {
+    margin-bottom: 40px;
+  }
+
+  .section-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-prose {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 2;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── THE ARGUMENT ── */
+  .argument-prose {
+    font-size: 13.5px;
+    color: var(--text);
+    line-height: 2.1;
+    letter-spacing: 0.3px;
+    border-left: 2px solid var(--accent);
+    padding-left: 20px;
+  }
+
+  /* ── THE MAP ── */
+  .map-block {
+    margin-bottom: 20px;
+  }
+
+  .map-block-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  .map-block-content {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.9;
+    letter-spacing: 0.3px;
+  }
+
+  .connections-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .connections-list li {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    padding-left: 14px;
+    position: relative;
+  }
+
+  .connections-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    opacity: 0.6;
+  }
+
+  /* ── THE PROVOCATION ── */
+  .provocation-block {
+    margin-bottom: 24px;
+  }
+
+  .provocation-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .provocation-content {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.9;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── IGNITION QUESTIONS ── */
+  .ignition-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .ignition-item {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-mid);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+  }
+
+  .ignition-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+
+  /* ── TIMESTAMP ── */
+  .ts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .ts-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+    color: var(--text-sub);
+  }
+
+  .ts-table td:first-child {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    white-space: nowrap;
+    width: 72px;
+    padding-right: 16px;
+    font-size: 11px;
+  }
+
+  .ts-table tr:last-child td { border-bottom: none; }
+
+  /* ── ACTION ROW ── */
+  .action-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .action-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .action-btn.primary {
+    color: var(--accent);
+    border-color: var(--accent-mid);
+    background: var(--accent-dim);
+  }
+
+  .action-btn.primary:hover { background: rgba(74, 138, 229, 0.2); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <span class="logo">PIERCE</span>
+    <span class="logo-sub">Knowledge Lens — AI Creative Lab</span>
+  </div>
+  <button class="api-btn" onclick="openModal()">API KEYS</button>
+</header>
+
+<!-- API MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-title">API KEYS</div>
+    <div class="modal-field">
+      <div class="modal-label">Claude API Key</div>
+      <input class="modal-input" type="password" id="claudeKeyInput" placeholder="sk-ant-...">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Gemini API Key</div>
+      <input class="modal-input" type="password" id="geminiKeyInput" placeholder="AIza...">
+    </div>
+    <button class="modal-save" onclick="saveKeys()">SAVE</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-title">PIERCE</div>
+    <div class="hero-divider"></div>
+    <div class="hero-desc">
+      텍스트의 표면을 뚫고 논지의 뼈대를 드러낸다.<br>
+      저자가 말한 것, 말하지 않은 것, 그리고 당신이 지금 던져야 할 질문.
+    </div>
+  </div>
+
+  <!-- INPUT PANEL -->
+  <div class="input-panel">
+    <div class="tab-row">
+      <button class="tab active" id="tabVideo" onclick="switchTab('video')">VIDEO</button>
+      <button class="tab" id="tabText" onclick="switchTab('text')">TEXT</button>
+    </div>
+
+    <!-- VIDEO PANEL -->
+    <div class="panel-body" id="panelVideo">
+      <div class="input-label">YouTube URL</div>
+      <input class="url-input" type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+      <div class="input-note">공개 영상만 분석 가능 · Gemini API 사용 · 약 300토큰/초</div>
+    </div>
+
+    <!-- TEXT PANEL -->
+    <div class="panel-body" id="panelText" style="display:none;">
+      <div class="sub-mode-row">
+        <button class="toggle-btn active" id="toggleUrl" onclick="switchTextMode('url')">URL</button>
+        <button class="toggle-btn" id="togglePaste" onclick="switchTextMode('paste')">직접 붙여넣기</button>
+      </div>
+
+      <div id="textUrlArea">
+        <div class="input-label">웹페이지 URL</div>
+        <input class="url-input" type="text" id="textUrl" placeholder="https://...">
+        <div class="input-note">robots.txt 또는 SSL 차단 시 접근 불가 → 직접 붙여넣기로 전환</div>
+      </div>
+
+      <div id="textPasteArea" style="display:none;">
+        <div class="input-label">텍스트 붙여넣기</div>
+        <textarea class="text-area" id="textPaste" placeholder="아티클, 책 챕터, 뉴스레터, 스크립트 등 분석할 텍스트를 붙여넣으세요."></textarea>
+        <div class="input-note">Claude 단독 처리 · Gemini 호출 없음</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUN BUTTON -->
+  <button class="run-btn" id="runBtn" onclick="runPierce()">PIERCE</button>
+
+  <!-- STATUS -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot"></div>
+    <span id="statusText">분석 중...</span>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-box" id="errorBox"></div>
+
+  <!-- REPORT -->
+  <div class="report-container" id="reportContainer"></div>
+
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+let currentTab = 'video';
+let currentTextMode = 'url';
+let currentReport = null;
+
+// Gemini 캐시
+let geminiCache = {
+  key: null,
+  result: null
+};
+
+function getInputKey() {
+  if (currentTab === 'video') {
+    return 'video::' + document.getElementById('videoUrl').value.trim();
+  } else if (currentTextMode === 'url') {
+    return 'weburl::' + document.getElementById('textUrl').value.trim();
+  } else {
+    const text = document.getElementById('textPaste').value.trim();
+    return 'paste::' + text.slice(0, 200);
+  }
+}
+
+function invalidateCacheOnInput() {
+  const key = getInputKey();
+  if (geminiCache.key && geminiCache.key !== key) {
+    geminiCache = { key: null, result: null };
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+window.onload = () => {
+  const ck = localStorage.getItem('claude_key');
+  const gk = localStorage.getItem('gemini_key');
+  if (ck) document.getElementById('claudeKeyInput').value = ck;
+  if (gk) document.getElementById('geminiKeyInput').value = gk;
+
+  document.getElementById('videoUrl').addEventListener('input', invalidateCacheOnInput);
+  document.getElementById('textUrl').addEventListener('input', invalidateCacheOnInput);
+  document.getElementById('textPaste').addEventListener('input', invalidateCacheOnInput);
+};
+
+// ─── API MODAL ────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function saveKeys() {
+  const ck = document.getElementById('claudeKeyInput').value.trim();
+  const gk = document.getElementById('geminiKeyInput').value.trim();
+  if (ck) localStorage.setItem('claude_key', ck);
+  if (gk) localStorage.setItem('gemini_key', gk);
+  closeModal();
+  showToast('API KEYS SAVED');
+}
+
+// ─── TAB / MODE ───────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('panelVideo').style.display = tab === 'video' ? 'block' : 'none';
+  document.getElementById('panelText').style.display = tab === 'text' ? 'block' : 'none';
+  document.getElementById('tabVideo').classList.toggle('active', tab === 'video');
+  document.getElementById('tabText').classList.toggle('active', tab === 'text');
+  clearReport();
+}
+
+function switchTextMode(mode) {
+  currentTextMode = mode;
+  document.getElementById('textUrlArea').style.display = mode === 'url' ? 'block' : 'none';
+  document.getElementById('textPasteArea').style.display = mode === 'paste' ? 'block' : 'none';
+  document.getElementById('toggleUrl').classList.toggle('active', mode === 'url');
+  document.getElementById('togglePaste').classList.toggle('active', mode === 'paste');
+}
+
+// ─── MAIN PIERCE ──────────────────────────────────────────
+async function runPierce() {
+  const claudeKey = localStorage.getItem('claude_key');
+  const geminiKey = localStorage.getItem('gemini_key');
+
+  hideError();
+  clearReport();
+
+  if (!claudeKey) { showError('Claude API Key가 설정되지 않았습니다. 우측 상단 API KEYS를 클릭해 입력해주세요.'); return; }
+
+  let inputContent = '';
+  let inputType = '';
+
+  if (currentTab === 'video') {
+    const url = document.getElementById('videoUrl').value.trim();
+    if (!url) { showError('YouTube URL을 입력해주세요.'); return; }
+    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+      showError('유효한 YouTube URL을 입력해주세요.'); return;
+    }
+    if (!geminiKey) { showError('YouTube 분석을 위해 Gemini API Key가 필요합니다.'); return; }
+    inputContent = url;
+    inputType = 'youtube_url';
+  } else {
+    if (currentTextMode === 'url') {
+      const url = document.getElementById('textUrl').value.trim();
+      if (!url) { showError('URL을 입력해주세요.'); return; }
+      if (!geminiKey) { showError('URL 분석을 위해 Gemini API Key가 필요합니다.'); return; }
+      inputContent = url;
+      inputType = 'web_url';
+    } else {
+      const text = document.getElementById('textPaste').value.trim();
+      if (!text) { showError('분석할 텍스트를 붙여넣어주세요.'); return; }
+      inputContent = text;
+      inputType = 'paste';
+    }
+  }
+
+  setLoading(true);
+
+  try {
+    let rawAnalysis = '';
+    const inputKey = getInputKey();
+    const needsGemini = inputType === 'youtube_url' || inputType === 'web_url';
+
+    if (needsGemini) {
+      if (geminiCache.key === inputKey && geminiCache.result) {
+        updateStatus('캐시된 분석 데이터 사용 중 — Claude가 보고서 작성 중...');
+        rawAnalysis = geminiCache.result;
+      } else {
+        rawAnalysis = await callGemini(geminiKey, inputContent, inputType);
+        geminiCache = { key: inputKey, result: rawAnalysis };
+      }
+    } else {
+      rawAnalysis = inputContent;
+    }
+
+    const report = await callClaude(claudeKey, rawAnalysis, inputType, inputContent);
+    currentReport = report;
+    renderReport(report);
+
+  } catch (err) {
+    showError(err.message || '분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ─── GEMINI CALL ──────────────────────────────────────────
+async function callGemini(apiKey, input, inputType) {
+  updateStatus('Gemini가 콘텐츠를 분석 중...');
+
+  const isYoutube = inputType === 'youtube_url';
+  const prompt = isYoutube
+    ? `다음 YouTube 영상을 분석해주세요: ${input}\n\n영상의 전체 내용을 상세하게 분석하여 다음을 포함해주세요:\n- 영상의 주제와 핵심 목적\n- 화자의 주요 주장과 근거\n- 중요한 세부 내용과 예시\n- 타임스탬프와 각 구간의 내용\n- 전반적인 맥락과 배경\n\n최대한 상세하고 구조적으로 분석해주세요.`
+    : `다음 URL의 웹페이지 내용을 분석해주세요: ${input}\n\n페이지의 전체 내용을 상세하게 분석하여 다음을 포함해주세요:\n- 주제와 핵심 목적\n- 주요 주장과 근거\n- 중요한 세부 내용과 데이터\n- 전반적인 맥락과 배경\n\n최대한 상세하고 구조적으로 분석해주세요.`;
+
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { maxOutputTokens: 8192, temperature: 0.3 }
+  };
+
+  const retryDelays = [5000, 10000, 20000, 30000, 40000];
+  const maxAttempts = 5;
+  let lastError = null;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      if (attempt > 0) {
+        const waitSec = retryDelays[attempt - 1] / 1000;
+        for (let i = waitSec; i > 0; i--) {
+          updateStatus(`Gemini 서버 혼잡 — ${attempt + 1}번째 재시도 대기 중... (${i}초)`);
+          await sleep(1000);
+        }
+        updateStatus(`Gemini 재연결 중... (${attempt + 1}/${maxAttempts})`);
+      }
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      );
+
+      if (res.status === 429 || res.status === 503 || res.status === 500) {
+        const errData = await res.json().catch(() => ({}));
+        lastError = `Gemini API 오류 (${res.status}): ${errData.error?.message || '서버 혼잡'}`;
+        if (attempt < maxAttempts - 1) continue;
+        throw new Error(lastError);
+      }
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        if (!isYoutube) {
+          throw new Error('페이지 접근에 실패했습니다. 직접 붙여넣기 모드로 전환해 텍스트를 붙여넣어 주세요.');
+        }
+        throw new Error(`Gemini API 오류: ${err.error?.message || res.status}`);
+      }
+
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error('Gemini에서 응답을 받지 못했습니다.');
+
+      if (attempt > 0) updateStatus(`${attempt + 1}번째 시도에서 성공했습니다. Claude가 보고서 작성 중...`);
+      return text;
+
+    } catch (e) {
+      if (e.message.includes('붙여넣기')) throw e;
+      lastError = e.message;
+      if (attempt === maxAttempts - 1) throw new Error(`Gemini 연결 실패 (${maxAttempts}회 시도): ${lastError}`);
+    }
+  }
+}
+
+// ─── CLAUDE CALL ──────────────────────────────────────────
+async function callClaude(apiKey, content, inputType, originalInput) {
+  updateStatus('Claude가 보고서를 작성 중...');
+
+  const isVideo = inputType === 'youtube_url';
+
+  const systemPrompt = `당신은 지식 해체 전문가입니다. 주어진 콘텐츠를 분석하여 정확히 아래 JSON 스키마로만 응답하세요. JSON 외의 어떤 텍스트도 포함하지 마세요.
+
+━━━ 문체 원칙 ━━━
+- 단문 위주. 주장 → 근거 → 함의의 흐름을 유지하라.
+- 독자를 가르치지 말 것. 함께 생각하는 톤으로, 그러나 실제로는 독자를 특정 방향으로 이끌어라.
+- the_argument는 그 자체로 좋은 논지 정리 글쓰기의 예시가 되어야 한다. 요약이 아닌 재서술. 저자의 언어가 아닌 당신의 언어로 논증을 재구성하라.
+- 군더더기를 제거하라. 모든 문장이 이유가 있어야 한다.
+
+━━━ 깊이 원칙 ━━━
+- 표면 요약 절대 금지. 저자가 말한 것 너머까지 반드시 닿아야 한다.
+- the_map.tensions: 이 주장과 실제로 충돌하는 시각을 구체적으로 제시하라. 막연한 "반론도 있다"는 금지.
+- the_provocation.blind_spots: 저자가 의도적으로 피한 것, 전제하지만 증명하지 않은 것을 정확히 짚어라.
+- the_provocation.reframe: 완전히 다른 프레임에서 이 주장이 어떻게 다르게 보이는지 구체적으로 서술하라.
+- ignition 질문 3개: 독자가 읽고 나서 멍하게 앉아있게 만드는 질문. 답이 쉽게 나오지 않아야 한다. 범용적인 지적 질문이 아닌, 이 텍스트에서만 나올 수 있는 날카로운 질문이어야 한다. 사고를 건드리고 확장시키는 질문.
+
+JSON 스키마:
+{
+  "source_info": "출처 정보 (제목, 채널명, 저자, 날짜 등 파악 가능한 것)",
+  "the_argument": "저자/화자의 핵심 논지와 논증 구조를 클로드의 언어로 재서술한 산문. 요약이 아닌 재구성. 단문 위주, 논리 흐름이 살아있는 글.",
+  "the_map": {
+    "context": "이 주장이 등장한 배경과 전제. 왜 지금 이 시점에 이 주장인가.",
+    "connections": ["연결되는 개념/분야/역사적 선례 — 각 항목은 구체적으로"],
+    "tensions": "이 주장과 충돌하거나 경쟁하는 구체적 시각. 단순한 반론 나열이 아닌, 실제 긴장 관계를 드러낼 것."
+  },
+  "the_provocation": {
+    "blind_spots": "저자가 전제하지만 증명하지 않은 것. 의도적으로 피한 것. 구체적으로.",
+    "reframe": "완전히 다른 각도에서 이 주장을 보면 어떻게 달라지는가. 구체적 프레임 전환.",
+    "ignition": ["질문1", "질문2", "질문3"]
+  },
+  "timestamps": [
+    { "time": "MM:SS", "description": "구간 설명" }
+  ]
+}
+
+timestamps 배열: ${isVideo ? 'YouTube 영상이므로 3-6개 핵심 구간을 포함하세요.' : '텍스트 콘텐츠이므로 빈 배열([])로 두세요.'}
+
+모든 텍스트는 한국어로 작성하세요.`;
+
+  const userMessage = inputType === 'paste'
+    ? `다음 텍스트를 분석해주세요:\n\n${content}`
+    : `다음은 콘텐츠 분석 결과입니다. 이를 바탕으로 보고서를 작성하세요:\n\n${content}`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 16000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(`Claude API 오류: ${err.error?.message || res.status}`);
+  }
+
+  const data = await res.json();
+  const raw = data.content?.[0]?.text || '';
+
+  // 3단계 JSON 파싱 폴백
+  let parsed = null;
+
+  try { parsed = JSON.parse(raw); } catch {}
+
+  if (!parsed) {
+    try {
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (match) parsed = JSON.parse(match[0]);
+    } catch {}
+  }
+
+  if (!parsed) {
+    try {
+      const clean = raw.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch {}
+  }
+
+  if (!parsed) throw new Error('보고서 파싱에 실패했습니다. 다시 시도해주세요.');
+  return parsed;
+}
+
+// ─── RENDER REPORT ────────────────────────────────────────
+function renderReport(r) {
+  const container = document.getElementById('reportContainer');
+  container.innerHTML = '';
+
+  let html = '';
+
+  // HEADER
+  html += `
+    <div class="report-header">
+      <div>
+        <div class="report-tag">PIERCE REPORT</div>
+        <div class="report-meta">${escHtml(r.source_info || '')}</div>
+      </div>
+      <div class="report-badge">FULL DEPTH</div>
+    </div>
+  `;
+
+  // THE ARGUMENT
+  if (r.the_argument) {
+    html += section('THE ARGUMENT', `<div class="argument-prose">${escHtml(r.the_argument)}</div>`);
+  }
+
+  // THE MAP
+  if (r.the_map) {
+    const m = r.the_map;
+    let mapHtml = '';
+
+    if (m.context) {
+      mapHtml += `
+        <div class="map-block">
+          <div class="map-block-label">CONTEXT</div>
+          <div class="map-block-content">${escHtml(m.context)}</div>
+        </div>
+      `;
+    }
+
+    if (m.connections?.length) {
+      mapHtml += `
+        <div class="map-block">
+          <div class="map-block-label">CONNECTIONS</div>
+          <ul class="connections-list">
+            ${m.connections.map(c => `<li>${escHtml(c)}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+    }
+
+    if (m.tensions) {
+      mapHtml += `
+        <div class="map-block">
+          <div class="map-block-label">TENSIONS</div>
+          <div class="map-block-content">${escHtml(m.tensions)}</div>
+        </div>
+      `;
+    }
+
+    html += section('THE MAP', mapHtml);
+  }
+
+  // THE PROVOCATION
+  if (r.the_provocation) {
+    const p = r.the_provocation;
+    let provHtml = '';
+
+    if (p.blind_spots) {
+      provHtml += `
+        <div class="provocation-block">
+          <div class="provocation-label">BLIND SPOTS</div>
+          <div class="provocation-content">${escHtml(p.blind_spots)}</div>
+        </div>
+      `;
+    }
+
+    if (p.reframe) {
+      provHtml += `
+        <div class="provocation-block">
+          <div class="provocation-label">REFRAME</div>
+          <div class="provocation-content">${escHtml(p.reframe)}</div>
+        </div>
+      `;
+    }
+
+    if (p.ignition?.length) {
+      provHtml += `
+        <div class="provocation-block">
+          <div class="provocation-label">IGNITION</div>
+          <ul class="ignition-list">
+            ${p.ignition.map((q, i) => `
+              <li class="ignition-item">
+                <div class="ignition-num">Q${i + 1}</div>
+                ${escHtml(q)}
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `;
+    }
+
+    html += section('THE PROVOCATION', provHtml);
+  }
+
+  // TIMESTAMP INDEX (YouTube only)
+  if (r.timestamps?.length) {
+    let rows = r.timestamps.map(t =>
+      `<tr><td>${escHtml(t.time)}</td><td>${escHtml(t.description)}</td></tr>`
+    ).join('');
+    html += section('TIMESTAMP INDEX', `<table class="ts-table">${rows}</table>`);
+  }
+
+  // ACTION BUTTONS
+  html += `
+    <div class="action-row">
+      <button class="action-btn primary" onclick="copyMarkdown()">COPY AS MARKDOWN</button>
+    </div>
+  `;
+
+  container.innerHTML = html;
+  container.classList.add('visible');
+}
+
+// ─── HELPERS ─────────────────────────────────────────────
+function section(label, content) {
+  return `
+    <div class="report-section">
+      <div class="section-label">${label}</div>
+      ${content}
+    </div>
+  `;
+}
+
+function copyMarkdown() {
+  if (!currentReport) return;
+  const r = currentReport;
+  let md = `# PIERCE REPORT\n`;
+  md += `**출처:** ${r.source_info || ''}\n\n`;
+
+  if (r.the_argument) {
+    md += `## THE ARGUMENT\n${r.the_argument}\n\n`;
+  }
+
+  if (r.the_map) {
+    md += `## THE MAP\n`;
+    if (r.the_map.context) md += `\n**CONTEXT**\n${r.the_map.context}\n`;
+    if (r.the_map.connections?.length) {
+      md += `\n**CONNECTIONS**\n`;
+      r.the_map.connections.forEach(c => { md += `- ${c}\n`; });
+    }
+    if (r.the_map.tensions) md += `\n**TENSIONS**\n${r.the_map.tensions}\n`;
+    md += '\n';
+  }
+
+  if (r.the_provocation) {
+    md += `## THE PROVOCATION\n`;
+    if (r.the_provocation.blind_spots) md += `\n**BLIND SPOTS**\n${r.the_provocation.blind_spots}\n`;
+    if (r.the_provocation.reframe) md += `\n**REFRAME**\n${r.the_provocation.reframe}\n`;
+    if (r.the_provocation.ignition?.length) {
+      md += `\n**IGNITION**\n`;
+      r.the_provocation.ignition.forEach((q, i) => { md += `${i + 1}. ${q}\n`; });
+    }
+    md += '\n';
+  }
+
+  if (r.timestamps?.length) {
+    md += `## TIMESTAMP INDEX\n`;
+    r.timestamps.forEach(t => { md += `- **${t.time}** — ${t.description}\n`; });
+    md += '\n';
+  }
+
+  navigator.clipboard.writeText(md).then(() => showToast('COPIED TO CLIPBOARD'));
+}
+
+function setLoading(on) {
+  document.getElementById('runBtn').disabled = on;
+  document.getElementById('runBtn').textContent = on ? 'PIERCING...' : 'PIERCE';
+  document.getElementById('statusBar').classList.toggle('visible', on);
+  if (!on) document.getElementById('statusBar').classList.remove('visible');
+}
+
+function updateStatus(msg) {
+  document.getElementById('statusText').textContent = msg;
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('visible');
+}
+
+function clearReport() {
+  const c = document.getElementById('reportContainer');
+  c.classList.remove('visible');
+  c.innerHTML = '';
+  currentReport = null;
+  hideError();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+
+function escAttr(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
